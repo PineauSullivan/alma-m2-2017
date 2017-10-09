@@ -29,10 +29,20 @@ after_success:
 - docker images
 - docker push foorganization/alma-server:latest
 
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$TRAVIS_BRANCH-v0.1.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$GITHUB_API_KEY@github.com/foo-organization/alma-m2-2017 --tags
+
 deploy:
-  provider: releases
-  api_key: 86946d56927440e6bb57890cda836f4ceef633d5
-  file: "alma-server-1.0.0-SNAPSHOT.jar"
   skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: [redacted]
+  file:
+    - "alma-server-1.0.0-SNAPSHOT.jar"
   on:
     tags: true
+
